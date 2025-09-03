@@ -12,8 +12,8 @@
       <p class="person-description">{{ description }}</p>
       <div v-if="githubUrl" class="github-info">
         <div class="github-label">
-          <i class="iconfont icon-github-fill"></i>
-          github主页：
+          <i class="iconfont" :class="urlType === 1 ? 'icon-github-fill' : 'icon-shouye'"></i>
+          {{ urlType === 1 ? 'github主页：' : '个人主页：' }}
         </div>
         <a 
           :href="githubUrl" 
@@ -34,6 +34,7 @@ interface Props {
   avatarUrl: string
   description: string
   githubUrl: string
+  urlType: number
 }
 
 const props = defineProps<Props>()
@@ -58,8 +59,8 @@ const props = defineProps<Props>()
 }
 
 .avatar-container {
-  width: 80px;
-  height: 80px;
+  width: 100px;
+  height: 100px;
   margin: 0 auto 16px;
 }
 
@@ -86,6 +87,13 @@ const props = defineProps<Props>()
   margin-bottom: 16px;
   color: rgba(64, 64, 64, 0.8);
   line-height: 1.5;
+  text-align: left;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  height: 5.4rem;
 }
 
 .github-info {

@@ -24,13 +24,59 @@
         <p class="blog-date">Apr 26, 2024</p>
       </div>
     </div>
+
+    <!-- 分类列表 -->
+    <div class="category-section">
+      <h3 class="section-title">专栏文</h3>
+      <div class="category-list">
+        <button 
+          v-for="category in categories"
+          :key="category"
+          class="category-item"
+          :class="{ active: selectedCategory === category }"
+          @click="filterByCategory(category)"
+        >
+          {{ category }} ({{ getCategoryCount(category) }})
+        </button>
+      </div>
+    </div>
     
+
   </div>
 </template>
 
 <script setup lang="ts">
-// Profile组件的脚本部分
+import { computed } from 'vue';
+import type { Article } from '../types/article';
 
+interface Props {
+  allArticles: Article[];
+  selectedCategory: string;
+  selectedTag?: string;
+  filterByCategory: (category: string) => void;
+  filterByTag?: (tag: string) => void;
+}
+
+const props = defineProps<Props>();
+
+// 计算分类列表
+const categories = computed(() => {
+  const categorySet = new Set<string>();
+  props.allArticles.forEach(article => {
+    article.categories?.forEach(category => {
+      categorySet.add(category);
+    });
+  });
+  return ['全部', ...Array.from(categorySet)];
+});
+
+// 获取分类文章数量
+const getCategoryCount = (category: string) => {
+  if (category === '全部') return props.allArticles.length;
+  return props.allArticles.filter(article => 
+    article.categories?.includes(category)
+  ).length;
+};
 </script>
 
 <style scoped>
@@ -57,6 +103,39 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
+/* 分类样式 */
+.category-section {
+  background: rgba(255, 255, 255, 0.3);
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.category-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.category-item {
+  background: none;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  padding: 5px 0;
+  color: #666;
+  transition: color 0.3s;
+}
+
+.category-item:hover {
+  color: #646cff;
+}
+
+.category-item.active {
+  color: #646cff;
+  font-weight: bold;
+}
+
 .avatar-container {
   width: 100px;
   height: 100px;
@@ -79,7 +158,6 @@
   color: #000;
   margin: 0 0 20px 0;
 }
-
 
 .section-title {
   font-size: 19px;

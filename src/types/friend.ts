@@ -20,5 +20,6 @@ export interface Friend {
   /**
    * 主页URL
    */
+  url_type : number; // url类型，0表示个人博客，1表示github
   url: string;
 }

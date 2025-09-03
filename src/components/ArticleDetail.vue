@@ -11,53 +11,86 @@
     </div>
     
     <div v-else-if="article" class="article-detail">
-      <!-- 文章图片 -->
-      <div class="article-image-container">
-        <img :src="article.bgImage || '/basic/default_bg.png'" :alt="article.title" class="article-image" />
+      <!-- 加载markdown内容 -->
+      <div v-if="markdownLoading && article.markdownPath" class="markdown-loading">
+        <LoadingAnimation size="small" />
+        <p>正在加载文章内容...</p>
       </div>
       
-      <!-- 文章头部 -->
-      <div class="article-header">
-        <h1 class="article-title">{{ article.title }}</h1>
-        
-        <!-- 文章元信息 -->
-        <div class="article-meta">
-          <div class="meta-info">
-            <span class="meta-item">
-              <i class="iconfont icon-bianji"></i> 发布于: {{ formatDate(article.createdAt) }}
-            </span>
-            <span class="meta-item">
-              <i class="iconfont icon-gengxin"></i> 更新于: {{ formatDate(article.updatedAt) }}
-            </span>
-            <span class="meta-item">
-              <i class="iconfont icon-zishu"></i> {{ article.wordCount }} 字
-            </span>
+      <!-- 主内容区域 -->
+      <div class="article-main-content">
+        <!-- 文章内容 -->
+        <div class="article-content-wrapper">
+          <!-- 文章正文 - 分两部分显示：标题和内容 -->
+          <div class="article-body">
+            <!-- Markdown标题 -->
+            <div v-html="markdownTitle"></div>
+            
+            <!-- 文章目录 - 移动到标题下方、正文左侧 -->
+            <div class="article-toc-container" ref="tocContainerRef">
+              <div class="toc-header">
+                <h3>目录</h3>
+              </div>
+              <div class="toc-content" v-if="tocItems.length > 0">
+                <ul class="toc-list">
+                  <li 
+                    v-for="(item, index) in tocItems" 
+                    :key="index" 
+                    :class="['toc-item', `toc-level-${item.level}`]"
+                    @click="scrollToHeading(item.id)"
+                  >
+                    {{ item.title }}
+                  </li>
+                </ul>
+              </div>
+              <div v-else class="toc-empty">
+                <p>暂无目录</p>
+              </div>
+            </div>
+            
+            <!-- 文章元信息 - 放在markdown标题下方 -->
+            <div class="article-meta-container">
+              <div class="article-meta">
+                <div class="meta-info">
+                  <span class="meta-item">
+                    <i class="iconfont icon-bianji"></i> {{ formatDate(article.updatedAt) }}
+                  </span>
+                  <span class="meta-item">
+                    <i class="iconfont icon-zishu"></i> {{ article.wordCount }} 字
+                  </span>
+                </div>
+                
+                <!-- 标签 -->
+                <div class="article-tags">
+                  <i class="iconfont icon-biaoqian"></i>
+                  <span v-for="tag in article.tags" :key="tag" class="tag">{{ tag }}</span>
+                </div>
+              </div>
+            </div>
+            
+            <!-- 文章图片 - 放在元信息下方 -->
+            <div class="article-image-container">
+              <img :src="article.bgImage || '/basic/default_bg.png'" :alt="article.title" class="article-image" />
+            </div>
+            
+            <!-- Markdown正文内容 -->
+            <div ref="contentRef" v-html="markdownContentWithoutTitle"></div>
           </div>
           
-          <!-- 标签 -->
-          <div class="article-tags">
-            <i class="iconfont icon-biaoqian"></i>
-            <span v-for="tag in article.tags" :key="tag" class="tag">{{ tag }}</span>
+          <!-- 底部操作 -->
+          <div class="article-actions">
+            <button class="back-button" @click="router.back()">返回列表</button>
           </div>
         </div>
-      </div>
-      
-      <!-- 文章正文 -->
-      <div class="article-body" v-html="renderedMarkdown"></div>
-      
-      <!-- 底部操作 -->
-      <div class="article-actions">
-        <button class="back-button" @click="router.back()">返回列表</button>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed, watch } from 'vue';
+import { ref, onMounted, computed, watch, onUnmounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import type { Article } from '../types/article';
-import { fetchArticleById } from '../api/articleService';
 import LoadingAnimation from './LoadingAnimation.vue';
 // @ts-ignore - 忽略markdown-it类型声明问题，确保代码正常运行
 import MarkdownIt from 'markdown-it';
@@ -69,15 +102,118 @@ const route = useRoute();
 const router = useRouter();
 
 const article = ref<Article | null>(null);
+const markdownContent = ref('');
 const loading = ref(true);
 const error = ref<string | null>(null);
+const markdownLoading = ref(false);
 // 配置markdown-it使用highlightjs插件
 const md = new MarkdownIt().use(markdownItHighlightjs);
 
-// 渲染Markdown内容
+// 解析markdown内容，提取标题和正文
+const parsedMarkdown = computed(() => {
+  if (!markdownContent.value) {
+    return { title: '', content: article.value?.summary || '' };
+  }
+  
+  // 匹配markdown中的一级标题（# 标题）
+  const titleMatch = markdownContent.value.match(/^#\s+([^\n]+)/m);
+  
+  if (titleMatch) {
+    // 提取标题和剩余内容
+    const title = titleMatch[1];
+    const content = markdownContent.value.replace(titleMatch[0], '');
+    return { title, content };
+  }
+  
+  // 如果没有一级标题，返回完整内容
+  return { title: '', content: markdownContent.value };
+});
+
+// Markdown标题部分
+const markdownTitle = computed(() => {
+  if (parsedMarkdown.value.title) {
+    return `<h1>${parsedMarkdown.value.title}</h1>`;
+  }
+  return '';
+});
+
+// Markdown正文内容部分（不含标题）
+const markdownContentWithoutTitle = computed(() => {
+  return md.render(parsedMarkdown.value.content);
+});
+
+// 目录项类型定义
+interface TocItem {
+  id: string;
+  title: string;
+  level: number;
+}
+
+// 目录数据
+const tocItems = ref<TocItem[]>([]);
+
+// 内容引用
+const contentRef = ref<HTMLElement | null>(null);
+const tocContainerRef = ref<HTMLElement | null>(null);
+
+// 解析文章内容生成目录
+const generateToc = () => {
+  if (!contentRef.value) return;
+  
+  const headers = contentRef.value.querySelectorAll('h2, h3, h4, h5, h6');
+  tocItems.value = Array.from(headers).map((header, index) => {
+    const level = parseInt(header.tagName.replace('H', ''));
+    const title = header.textContent || '';
+    
+    // 为标题添加唯一ID
+    const id = `heading-${index}`;
+    header.id = id;
+    
+    return {
+      id,
+      title,
+      level
+    };
+  });
+};
+
+// 滚动到指定标题
+const scrollToHeading = (id: string) => {
+  const element = document.getElementById(id);
+  if (element) {
+    const yOffset = -100; // 偏移量，避免被导航栏遮挡
+    const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+    window.scrollTo({ top: y, behavior: 'smooth' });
+  }
+};
+
+// 处理滚动事件，使目录保持固定
+const handleScroll = () => {
+  if (!tocContainerRef.value) return;
+  
+  // 当页面滚动超过一定距离时，固定目录
+  if (window.scrollY > 100) {
+    tocContainerRef.value.classList.add('fixed');
+  } else {
+    tocContainerRef.value.classList.remove('fixed');
+  }
+};
+
+// 监听内容变化，重新生成目录
+watch(markdownContentWithoutTitle, () => {
+  // 使用setTimeout确保DOM已经更新
+  setTimeout(() => {
+    generateToc();
+  }, 0);
+});
+
+// 完整的渲染内容（用于向后兼容）
 const renderedMarkdown = computed(() => {
-  if (!article.value) return '';
-  return md.render(article.value.body);
+  if (!markdownContent.value) {
+    // 如果没有加载到markdown内容，使用summary作为备用
+    return article.value?.summary ? md.render(article.value.summary) : '';
+  }
+  return md.render(markdownContent.value);
 });
 
 // 格式化日期
@@ -92,6 +228,25 @@ const formatDate = (dateString: string) => {
   });
 };
 
+// 从markdown文件加载内容
+const loadMarkdownContent = async (path: string) => {
+  if (!path) return;
+  
+  try {
+    markdownLoading.value = true;
+    const response = await fetch(path);
+    if (!response.ok) {
+      throw new Error('无法加载Markdown文件');
+    }
+    markdownContent.value = await response.text();
+  } catch (err) {
+    console.warn('加载Markdown文件失败，将使用summary作为替代:', err);
+    // 保持markdownContent为空，这样renderedMarkdown会使用summary作为备用
+  } finally {
+    markdownLoading.value = false;
+  }
+};
+
 // 获取文章详情
 const getArticleDetail = async () => {
   const id = route.params.id as string;
@@ -104,11 +259,24 @@ const getArticleDetail = async () => {
   try {
     loading.value = true;
     error.value = null;
-    const data = await fetchArticleById(id);
-    if (!data) {
+    markdownContent.value = '';
+    
+    // 1. 获取文章基本信息
+    const response = await fetch('/article/articles.json');
+    if (!response.ok) {
+      throw new Error('网络响应异常');
+    }
+    const articles = await response.json() as Article[];
+    const foundArticle = articles.find(a => a.id === id);
+    if (!foundArticle) {
       error.value = '文章不存在或已被删除';
     } else {
-      article.value = data;
+      article.value = foundArticle;
+      
+      // 2. 加载markdown文件内容
+      if (foundArticle.markdownPath) {
+        await loadMarkdownContent(foundArticle.markdownPath);
+      }
     }
   } catch (err) {
     error.value = err instanceof Error ? err.message : '获取文章失败';
@@ -117,9 +285,19 @@ const getArticleDetail = async () => {
   }
 };
 
+
+
 // 组件挂载时获取文章详情
 onMounted(() => {
   getArticleDetail();
+  
+  // 添加滚动事件监听
+  window.addEventListener('scroll', handleScroll);
+});
+
+// 组件卸载时移除滚动监听
+onUnmounted(() => {
+  window.removeEventListener('scroll', handleScroll);
 });
 
 // 监听路由参数变化，重新获取文章
@@ -131,8 +309,101 @@ route.params.id && watch(() => route.params.id, () => {
 <style scoped>
 .article-detail-page {
   padding: 20px;
-  max-width: 1100px;
+  max-width: 1200px;
   margin: 0 auto;
+}
+
+.article-main-content {
+  display: flex;
+  gap: 40px;
+}
+
+/* 目录样式 - 移动到标题下方、正文左侧 */
+.article-toc-container {
+  width: 300px;
+  background-color: rgba(255, 255, 255, 0);
+  border-radius: 8px;
+  padding: 15px;
+  position: fixed;
+  left: 20px;
+  top: 120px;
+  font-size: 18px;
+  max-height: calc(100vh - 240px);
+  overflow-y: auto;
+  z-index: 10;
+}
+
+.toc-header {
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #646cff;
+}
+
+.toc-header h3 {
+  margin: 0;
+  font-size: 20px;
+  color: #333;
+}
+
+.toc-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.toc-item {
+  padding: 8px 0;
+  cursor: pointer;
+  transition: all 0.3s;
+  color: #666;
+  font-size: 16px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border-radius: 4px;
+  padding-left: 10px;
+}
+
+.toc-item:hover {
+  background-color: #f0f0f0;
+  color: #646cff;
+  transform: translateX(4px);
+}
+
+/* 目录层级样式 */
+.toc-level-2 {
+  font-weight: 600;
+  font-size: 17px;
+}
+
+.toc-level-3 {
+  padding-left: 30px;
+  font-size: 15px;
+}
+
+.toc-level-4 {
+  padding-left: 40px;
+  font-size: 14px;
+  color: #888;
+}
+
+.toc-level-5,
+.toc-level-6 {
+  padding-left: 50px;
+  font-size: 13px;
+  color: #999;
+}
+
+.toc-empty {
+  text-align: center;
+  color: #999;
+  padding: 20px 0;
+}
+
+/* 文章内容容器 - 目录已使用fixed定位，不需要额外padding */
+.article-content-wrapper {
+  flex: 1;
+  min-width: 0;
 }
 
 .loading-container, .error-container {
@@ -170,42 +441,38 @@ route.params.id && watch(() => route.params.id, () => {
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0);
   overflow: hidden;
+  max-width: 1000px;
+  margin: 0 auto;
 }
 
-.article-image-container {
-  width: 100%;
-  height: 300px;
-  overflow: hidden;
-}
-
-.article-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.3s ease;
-}
-
-.article-image:hover {
-  transform: scale(1.02);
-}
-
-.article-header {
-  padding: 30px;
-  border-bottom: 1px solid #e8e8e8;
-}
-
-.article-title {
-  font-size: 36px;
-  font-weight: bold;
-  color: #333;
-  margin-bottom: 20px;
-  line-height: 1.4;
+.article-meta-container {
+  padding: 20px 30px 0;
 }
 
 .article-meta {
   display: flex;
-  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
   gap: 10px;
+}
+
+.article-image-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 20px 30px;
+}
+
+.article-image {
+  width: 50%;
+  height: auto;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.markdown-loading p {
+  margin-top: 16px;
+  font-size: 14px;
 }
 
 .meta-info {
@@ -242,6 +509,7 @@ route.params.id && watch(() => route.params.id, () => {
   color: #333;
   margin-bottom: 30px;
   padding: 0 30px;
+  position: relative;
 }
 
 /* Markdown 样式 */
@@ -280,7 +548,7 @@ route.params.id && watch(() => route.params.id, () => {
   padding: 2px 4px !important;
   border-radius: 3px !important;
   font-family: 'Consola', monospace !important;
-  font-size: 20px !important;
+  font-size: 17px !important;
   display: inline-block !important;
 }
 
@@ -298,7 +566,7 @@ route.params.id && watch(() => route.params.id, () => {
   margin-left: 25px !important;
   margin-right: 30px !important;
   max-width: calc(100% - 40px) !important;
-  font-size: 16px !important;
+  font-size: 6px !important;
 }
 
 /* 确保pre中的code继承pre的样式 */
@@ -341,30 +609,67 @@ route.params.id && watch(() => route.params.id, () => {
   margin-top: 30px;
   padding: 0 30px 30px 30px;
 }
+  
 
 /* 响应式设计 */
+@media (max-width: 1200px) {
+  .article-content-wrapper {
+    padding-left: 0;
+  }
+  
+  .article-toc-container {
+    position: relative;
+    width: 100%;
+    top: auto;
+    left: auto;
+    max-height: 300px;
+    margin-bottom: 20px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .article-main-content {
+    flex-direction: column;
+  }
+}
+
 @media (max-width: 768px) {
   .article-detail-page {
     padding: 10px;
+    max-width: 100%;
   }
   
   .article-image-container {
     height: 200px;
   }
   
-  .article-header,
   .article-body,
   .article-actions {
-    padding: 20px;
-  }
-  
-  .article-title {
-    font-size: 28px;
+    padding: 10px;
   }
   
   .meta-info {
     flex-direction: column;
     gap: 5px;
+  }
+  
+  .toc-item {
+    font-size: 11px;
+  }
+  
+  .toc-level-2 {
+    font-size: 12px;
+  }
+  
+  .toc-level-3 {
+    font-size: 11px;
+    padding-left: 15px;
+  }
+  
+  .toc-level-4,
+  .toc-level-5,
+  .toc-level-6 {
+    padding-left: 25px;
   }
 }
 </style>

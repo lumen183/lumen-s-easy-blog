@@ -5,21 +5,21 @@
     </div>
     
     <div class="about-content">
-      <!-- 左侧图片 -->
+      <!-- 头像和基本信息区域 -->
       <div class="about-image-container">
         <img 
-          src="/basic/default_bg.png" 
+          src="/basic/avatar.jpg" 
           alt="个人头像" 
           class="about-image"
         />
-      </div>
-      
-      <!-- 右侧信息 -->
-      <div class="about-info">
         <div class="info-item">
           <h2>lumen</h2>
           <p>迷途未远，今是昨非</p>
         </div>
+      </div>
+      
+      <!-- 右侧信息 -->
+      <div class="about-info">
         
         <div class="info-section">
           <h3><i class="iconfont icon-guanyu"></i>个人简介</h3>

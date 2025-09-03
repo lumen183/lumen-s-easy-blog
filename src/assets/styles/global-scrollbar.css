@@ -1,0 +1,148 @@
+/* 引入自定义字体 - Consola */
+@font-face {
+  font-family: 'CustomConsola';
+  src: url('../fonts/consola-1.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* 全局滚动条样式 - 最高优先级 */
+/* 针对所有可滚动元素 */
+*::-webkit-scrollbar {
+  width: 8px !important;
+  height: 8px !important;
+}
+
+*::-webkit-scrollbar-track {
+  background-color: white !important;
+  border-radius: 4px !important;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: #e0e0e0 !important;
+  border-radius: 4px !important;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background-color: #d0d0d0 !important;
+}
+
+/* 特别针对代码块的滚动条样式，确保覆盖highlight.js样式 */
+.article-detail-page .article-body pre::-webkit-scrollbar,
+.article-detail-page .article-body pre.hljs::-webkit-scrollbar {
+  width: 8px !important;
+  height: 8px !important;
+}
+
+.article-detail-page .article-body pre::-webkit-scrollbar-track,
+.article-detail-page .article-body pre.hljs::-webkit-scrollbar-track {
+  background-color: white !important;
+  border-radius: 4px !important;
+}
+
+.article-detail-page .article-body pre::-webkit-scrollbar-thumb,
+.article-detail-page .article-body pre.hljs::-webkit-scrollbar-thumb {
+  background-color: #e0e0e0 !important;
+  border-radius: 4px !important;
+}
+
+.article-detail-page .article-body pre::-webkit-scrollbar-thumb:hover,
+.article-detail-page .article-body pre.hljs::-webkit-scrollbar-thumb:hover {
+  background-color: #d0d0d0 !important;
+}
+
+/* 使用:root选择器确保最高优先级 */
+:root *::-webkit-scrollbar-track {
+  background-color: white !important;
+}
+
+:root .article-detail-page .article-body pre::-webkit-scrollbar-track,
+:root .article-detail-page .article-body pre.hljs::-webkit-scrollbar-track {
+  background-color: white !important;
+}
+
+/* 覆盖代码块样式 - 设置背景透明度为0.3和字体样式 */
+:root .article-detail-page .article-body code {
+  font-family: 'CustomConsola', 'Consola', monospace !important;
+  font-size: 17px !important;
+  background: rgba(255, 255, 255, 0.3) !important;
+}
+
+:root .article-detail-page .article-body pre {
+  font-family: 'CustomConsola', 'Consola', monospace !important;
+  font-size: 17px !important;
+  background: rgba(255, 255, 255, 0.3) !important;
+}
+
+:root .article-detail-page .article-body pre.hljs {
+  font-family: 'CustomConsola', 'Consola', monospace !important;
+  font-size: 17px !important;
+  background: rgba(255, 255, 255, 0.3) !important;
+}
+
+:root .article-detail-page .article-body pre code[class*="language-"] {
+  font-family: 'CustomConsola', 'Consola', monospace !important;
+  font-size: 18px !important;
+}
+
+/* 直接修改highlight.js的样式 */
+.hljs {
+  font-family: 'CustomConsola', 'Consola', monospace !important;
+  font-size: 13px !important;
+  background: rgba(255, 255, 255, 0.3) !important;
+}
+
+pre {
+  font-family: 'CustomConsola', 'Consola', monospace !important;
+  font-size: 13px !important;
+  background: rgba(255, 255, 255, 0.3) !important;
+}
+
+code {
+  font-family: 'CustomConsola', 'Consola', monospace !important;
+  font-size: 17px !important;
+  background: rgba(255, 255, 255, 0.3) !important;
+}
+
+/* 确保覆盖pre和code的所有组合 */
+pre code {
+  background: transparent !important;
+}
+
+pre.hljs code {
+  background: transparent !important;
+}
+
+/* 添加更具体的选择器确保覆盖所有可能的代码块结构 */
+:root pre.hljs {
+  font-size: 13px !important;
+}
+
+:root code {
+  font-size: 17px !important;
+}
+
+/* 确保覆盖highlight.js动态生成的所有元素 */
+:root .article-detail-page .article-body pre > code {
+  font-size: 13px !important;
+  background: transparent !important;
+}
+
+:root .article-detail-page .article-body pre.hljs > code {
+  font-size: 13px !important;
+  background: transparent !important;
+}
+
+:root .article-detail-page .article-body code.hljs {
+  font-size: 17px !important;
+  background: rgba(255, 255, 255, 0.3) !important;
+}
+
+/* 额外添加高优先级的背景透明度设置 */
+:root .article-detail-page .article-body .hljs {
+  background: rgba(255, 255, 255, 0.3) !important;
+}
+
+:root .article-detail-page .article-body code[class*="language-"] {
+  background: transparent !important;
+}

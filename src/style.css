@@ -141,3 +141,30 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+/* ArticleDetail页面标题样式 - 确保足够高的优先级 */
+.article-detail-page .article-body h2,
+.article-detail-page .article-body h3,
+.article-detail-page .article-body h4,
+.article-detail-page .article-body h5,
+.article-detail-page .article-body h6 {
+  font-family: 'SimHei', '黑体', sans-serif !important;
+  font-weight: bold !important;
+  position: relative;
+  padding-left: 20px;
+}
+
+.article-detail-page .article-body h2::before,
+.article-detail-page .article-body h3::before,
+.article-detail-page .article-body h4::before,
+.article-detail-page .article-body h5::before,
+.article-detail-page .article-body h6::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 10px;
+  height: 10px;
+  background-color: #646cff;
+}

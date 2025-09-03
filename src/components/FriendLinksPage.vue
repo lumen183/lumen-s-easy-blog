@@ -27,6 +27,7 @@
         :avatarUrl="friend.avatar"
         :description="friend.description"
         :githubUrl="friend.url"
+        :urlType="friend.url_type"
       />
     </div>
 
@@ -57,7 +58,6 @@
 import { ref, onMounted } from 'vue'
 import PersonCard from './PersonCard.vue'
 import LoadingAnimation from './LoadingAnimation.vue'
-import friendService from '../api/friendService'
 import type { Friend } from '../types/friend'
 
 const friends = ref<Friend[]>([])
@@ -67,7 +67,11 @@ const error = ref('')
 // 页面加载时获取友情链接数据
 onMounted(async () => {
   try {
-    friends.value = await friendService.getFriends()
+    const response = await fetch('/friendlink/friends.json')
+    if (!response.ok) {
+      throw new Error('网络响应异常')
+    }
+    friends.value = await response.json()
   } catch (err) {
     error.value = '获取友情链接数据失败'
     console.error('Failed to get friends:', err)

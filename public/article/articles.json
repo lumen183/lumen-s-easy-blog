@@ -1,0 +1,115 @@
+[
+  {
+    "id": "1",
+    "title": "纯 Python 实现简易版本的前向计算图捕获工具",
+    "tags": ["python", "torch", "编译", "计算图"],
+    "summary": "# 纯 Python 实现简易版本的前向计算图捕获工具\n\n## 前言\n\n最近知乎上有一位特殊的朋友发来求助，希望我帮助他实现`torch.fx.symbolic_trace`的简化版本。这让我想到，或许有很多开发者对计算图捕获的原理感兴趣，但又觉得官方实现过于复杂。因此，我决定写这篇文章，从零开始用纯Python实现一个简易的前向计算图捕获工具。",
+    "createdAt": "2025-08-25 23:06",
+    "updatedAt": "2025-08-25 23:06",
+    "wordCount": 2500,
+    "markdownPath": "/article/markdown/article_1.md"
+  },
+  {
+    "id": "2",
+    "title": "Vue 3 组合式 API 最佳实践",
+    "tags": ["vue", "javascript", "frontend", "web"],
+    "summary": "Vue 3 的组合式 API 为我们提供了一种更灵活的方式来组织和复用组件逻辑。本文将介绍一些使用组合式 API 的最佳实践，帮助你写出更清晰、可维护的 Vue 代码...",
+    "createdAt": "2025-08-24 15:30",
+    "updatedAt": "2025-08-24 16:45",
+    "wordCount": 3200,
+    "markdownPath": "/article/markdown/article_2.md"
+  },
+  {
+    "id": "3",
+    "title": "Go语言并发编程深入解析",
+    "tags": ["go", "concurrency", "backend", "performance"],
+    "summary": "Go语言以其简洁的语法和强大的并发支持而闻名。本文将深入探讨Go语言的并发模型，包括goroutine、channel、select等核心概念，并通过实例展示如何在实际项目中使用它们...",
+    "createdAt": "2025-08-23 10:15",
+    "updatedAt": "2025-08-23 14:20",
+    "wordCount": 4500,
+    "bgImage": "/basic/blog_bg.png",
+    "markdownPath": "/article/markdown/article_3.md"
+  },
+  {
+    "id": "4",
+    "title": "React Server Components 探索与实践",
+    "tags": ["react", "nextjs", "ssr", "frontend"],
+    "summary": "React Server Components 是React生态系统中的一个重要创新，它允许我们在服务器端渲染组件，减少客户端JavaScript的体积，提高应用性能。本文将介绍RSC的基本概念和使用方法...",
+    "createdAt": "2025-08-22 09:45",
+    "updatedAt": "2025-08-22 11:30",
+    "wordCount": 2800,
+    "markdownPath": "/article/markdown/article_4.md"
+  },
+  {
+    "id": "5",
+    "title": "Docker容器化部署实战指南",
+    "tags": ["docker", "devops", "deployment", "linux"],
+    "summary": "容器化技术已经成为现代应用部署的标准方式。本文将详细介绍如何使用Docker对应用进行容器化，包括Dockerfile编写、镜像构建、容器运行和Docker Compose的使用...",
+    "createdAt": "2025-08-21 14:20",
+    "updatedAt": "2025-08-21 16:50",
+    "wordCount": 3600,
+    "markdownPath": "/article/markdown/article_5.md"
+  },
+  {
+    "id": "6",
+    "title": "TypeScript 高级类型系统详解",
+    "tags": ["typescript", "javascript", "frontend", "typing"],
+    "summary": "TypeScript的类型系统是其最强大的特性之一。本文将深入探讨TypeScript的高级类型，包括泛型、条件类型、映射类型等，并通过实际案例展示如何利用这些特性编写更安全、更可维护的代码...",
+    "createdAt": "2025-08-20 10:30",
+    "updatedAt": "2025-08-20 15:20",
+    "wordCount": 3800,
+    "bgImage": "/basic/blog_bg.png",
+    "markdownPath": "/article/markdown/article_6.md"
+  },
+  {
+    "id": "7",
+    "title": "微前端架构设计与实践",
+    "tags": ["microfrontend", "frontend", "architecture", "webpack"],
+    "summary": "随着前端应用规模的不断扩大，微前端架构逐渐成为解决大型前端应用复杂性的有效方案。本文将介绍微前端的核心概念、设计原则和实现方式，并分享一些实际项目中的经验和教训...",
+    "createdAt": "2025-08-19 09:15",
+    "updatedAt": "2025-08-19 11:45",
+    "wordCount": 4200,
+    "markdownPath": "/article/markdown/article_7.md"
+  },
+  {
+    "id": "8",
+    "title": "GraphQL API 设计最佳实践",
+    "tags": ["graphql", "api", "backend", "frontend"],
+    "summary": "GraphQL作为一种新的API查询语言，正在改变我们构建和使用API的方式。本文将介绍GraphQL API设计的最佳实践，包括模式设计、查询优化、安全性考虑等方面的内容...",
+    "createdAt": "2025-08-18 14:45",
+    "updatedAt": "2025-08-18 17:20",
+    "wordCount": 3400,
+    "markdownPath": "/article/markdown/article_8.md"
+  },
+  {
+    "id": "9",
+    "title": "前端性能优化实战指南",
+    "tags": ["performance", "frontend", "optimization", "web"],
+    "summary": "性能是前端应用的关键指标之一。本文将从资源加载、渲染性能、运行时优化等多个维度，详细介绍前端性能优化的技术和方法，并提供一些实用的优化工具和测量手段...",
+    "createdAt": "2025-08-17 10:00",
+    "updatedAt": "2025-08-17 16:30",
+    "wordCount": 4800,
+    "bgImage": "/basic/blog_bg.png",
+    "markdownPath": "/article/markdown/article_9.md"
+  },
+  {
+    "id": "10",
+    "title": "现代CSS布局技巧与实践",
+    "tags": ["css", "frontend", "layout", "web"],
+    "summary": "CSS布局技术一直在不断发展，从早期的浮动布局到Flexbox和Grid，每一次技术进步都为前端开发者提供了更强大的布局能力。本文将介绍现代CSS布局的核心技术和实用技巧...",
+    "createdAt": "2025-08-16 15:30",
+    "updatedAt": "2025-08-16 18:15",
+    "wordCount": 3200,
+    "markdownPath": "/article/markdown/article_10.md"
+  },
+  {
+    "id": "11",
+    "title": "docker基础使用",
+    "tags": ["docker", "devops", "deployment", "linux"],
+    "summary": "容器化技术已经成为现代应用部署的标准方式。本文将详细介绍如何使用Docker对应用进行容器化，包括Dockerfile编写、镜像构建、容器运行和Docker Compose的使用...",
+    "createdAt": "2025-08-15 14:20",
+    "updatedAt": "2025-08-15 16:50",
+    "wordCount": 3600,
+    "markdownPath": "/article/markdown/article_11.md"
+  }
+]

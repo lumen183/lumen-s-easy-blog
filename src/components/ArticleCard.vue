@@ -11,7 +11,7 @@
 
       
       <!-- 文章摘要 -->
-      <p class="article-excerpt">{{ getExcerpt(article.body) }}</p>
+      <p class="article-excerpt">{{ getExcerpt(article.summary) }}</p>
       
       <!-- 文章元信息 -->
       <div class="article-meta">
@@ -53,7 +53,10 @@ const props = defineProps<{
 const router = useRouter();
 
 // 获取文章摘要（前100个字符）
-const getExcerpt = (content: string) => {
+const getExcerpt = (content?: string) => {
+  if (!content) {
+    return '';
+  }
   if (content.length <= 100) {
     return content;
   }

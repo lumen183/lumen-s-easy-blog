@@ -13,7 +13,7 @@ const routes: RouteRecordRaw[] = [
   },
   // 文章详情路由
   {
-    path: '/article/:id',
+    path: '/articles/:id',
     name: 'articleDetail',
     component: () => import('../components/ArticleDetail.vue')
   },
