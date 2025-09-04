@@ -4,18 +4,18 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/',
     name: 'home',
-    component: () => import('../components/HomePage.vue')
+    component: () => import('../views/HomePage.vue')
   },
   {
     path: '/articles',
     name: 'articles',
-    component: () => import('../components/ArticlesPage.vue')
+    component: () => import('../views/ArticlesPage.vue')
   },
   // 文章详情路由
   {
     path: '/articles/:id',
     name: 'articleDetail',
-    component: () => import('../components/ArticleDetail.vue')
+    component: () => import('../views/ArticleDetail.vue')
   },
   // 为了兼容性，将/blog重定向到/articles
   {
@@ -26,19 +26,19 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/friend-links',
     name: 'friendLinks',
-    component: () => import('../components/FriendLinksPage.vue')
+    component: () => import('../views/FriendLinksPage.vue')
   },
   // 关于我路由
   {
     path: '/aboutme',
     name: 'aboutMe',
-    component: () => import('../components/AboutMePage.vue')
+    component: () => import('../views/AboutMePage.vue')
   },
   // 404页面路由
   {
     path: '/:pathMatch(.*)*',
     name: 'notFound',
-    component: () => import('../components/NotFound.vue')
+    component: () => import('../views/NotFound.vue')
   }
 ]
 

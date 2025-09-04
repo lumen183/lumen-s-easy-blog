@@ -91,7 +91,7 @@
 import { ref, onMounted, computed, watch, onUnmounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import type { Article } from '../types/article';
-import LoadingAnimation from './LoadingAnimation.vue';
+import LoadingAnimation from '../components/LoadingAnimation.vue';
 // @ts-ignore - 忽略markdown-it类型声明问题，确保代码正常运行
 import MarkdownIt from 'markdown-it';
 import markdownItHighlightjs from 'markdown-it-highlightjs';
