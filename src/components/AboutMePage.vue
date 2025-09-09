@@ -120,7 +120,7 @@ import '../assets/icons/iconfont.css'
 }
 
 .info-item {
-  margin-bottom: 30px;
+  margin-bottom: 20px;
   text-align: center;
 }
 
@@ -131,10 +131,9 @@ import '../assets/icons/iconfont.css'
 }
 
 .info-item p {
-  font-size: 20px;
+  font-size: 10px;
   color: #666;
   margin: 0;
-  font-style: italic;
 }
 
 .info-section {

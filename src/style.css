@@ -34,6 +34,12 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* 只针对strong和b标签的粗体样式 */
+strong, b {
+  font-weight: bold !important;
+  color: #000 !important;
+}
+
 a {
   font-weight: 500;
   color: #646cff;
@@ -167,4 +173,16 @@ button:focus-visible {
   width: 10px;
   height: 10px;
   background-color: #646cff;
+}
+
+/* 全局文本和图片样式 */
+/* 仅对块引用的第一行设置缩进 */
+blockquote {
+  text-indent: 2em; /* 首行缩进2em，其他行不受影响 */
+}
+
+/* 图片居中显示 */
+img {
+  display: block;
+  margin: 0 auto;
 }

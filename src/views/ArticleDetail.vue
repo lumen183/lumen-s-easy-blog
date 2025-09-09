@@ -95,8 +95,11 @@ import LoadingAnimation from '../components/LoadingAnimation.vue';
 // @ts-ignore - 忽略markdown-it类型声明问题，确保代码正常运行
 import MarkdownIt from 'markdown-it';
 import markdownItHighlightjs from 'markdown-it-highlightjs';
+import markdownItKatex from 'markdown-it-katex';
 // 导入自定义的浅色highlight.js样式
 import '../assets/styles/highlight-light.css';
+// 导入KaTeX样式
+import 'katex/dist/katex.min.css';
 
 const route = useRoute();
 const router = useRouter();
@@ -106,8 +109,81 @@ const markdownContent = ref('');
 const loading = ref(true);
 const error = ref<string | null>(null);
 const markdownLoading = ref(false);
-// 配置markdown-it使用highlightjs插件
-const md = new MarkdownIt().use(markdownItHighlightjs);
+// 配置markdown-it使用highlightjs插件和katex插件
+const md = new MarkdownIt(
+  {html:true}
+).use(markdownItHighlightjs)
+ .use(markdownItKatex);
+
+// 添加自定义图片渲染规则，处理{width=85%}这样的属性
+function setupMarkdownItImageRenderer() {
+  // 保存原始的渲染规则
+  const defaultRender = md.renderer.rules.image || function(tokens, idx, options, env, self) {
+    return self.renderToken(tokens, idx, options);
+  };
+
+  // 覆盖图片渲染规则
+  md.renderer.rules.image = function(tokens, idx, options, env, self) {
+    const token = tokens[idx];
+    
+    // 强制添加居中样式
+    let style = token.attrGet('style') || '';
+    style += '; display: block !important; margin: 0 auto !important;';
+    token.attrSet('style', style);
+    
+    // 调用默认渲染器
+    return defaultRender(tokens, idx, options, env, self);
+  };
+
+  // 添加一个预处理步骤，在解析前处理markdown内容中的图片属性
+  const originalRender = md.render;
+  md.render = function(source, env) {
+    // 处理所有带有{width=xxx}或其他属性的图片
+    const processedSource = source.replace(/!\[(.*?)\]\((.*?)\)\{(.*?)\}/g, function(match, alt, src, attrs) {
+      // 构建包含内联style的img标签
+      let styleAttrs = '';
+      const attrList = attrs.split(',').map((attr: string) => attr.trim());
+      
+      attrList.forEach((attr: string) => {
+        const [key, value] = attr.split('=').map((part: string) => part.trim());
+        if (key === 'width') {
+          styleAttrs += `width: ${value};`;
+        } else if (key === 'height') {
+          styleAttrs += `height: ${value};`;
+        } else {
+          // 处理其他属性
+          styleAttrs += `${key}: ${value};`;
+        }
+      });
+      
+      // 强制添加居中样式
+      styleAttrs += 'display: block !important; margin: 0 auto !important;';
+      
+      // 返回处理后的HTML
+      return `<img src="${src}" alt="${alt}" style="${styleAttrs}">`;
+    });
+    
+    // 调用原始的render方法
+    return originalRender.call(this, processedSource, env);
+  };
+}
+
+// 设置markdown-it图片渲染器
+setupMarkdownItImageRenderer();
+
+// 扩展renderedMarkdown和markdownContentWithoutTitle计算属性，传递原始内容作为env
+const originalRenderedMarkdown = computed(() => {
+  if (!markdownContent.value) {
+    return article.value?.summary ? md.render(article.value.summary) : '';
+  }
+  // 传递原始markdown内容作为环境变量
+  return md.render(markdownContent.value, { source: markdownContent.value });
+});
+
+// 覆盖原来的渲染函数
+defineExpose({
+  originalRenderedMarkdown
+});
 
 // 解析markdown内容，提取标题和正文
 const parsedMarkdown = computed(() => {
@@ -139,7 +215,8 @@ const markdownTitle = computed(() => {
 
 // Markdown正文内容部分（不含标题）
 const markdownContentWithoutTitle = computed(() => {
-  return md.render(parsedMarkdown.value.content);
+  // 传递原始markdown内容作为环境变量，这样我们可以在自定义渲染器中访问它
+  return md.render(parsedMarkdown.value.content, { source: markdownContent.value });
 });
 
 // 目录项类型定义
@@ -529,6 +606,48 @@ route.params.id && watch(() => route.params.id, () => {
 .article-body p {
   margin-bottom: 15px;
   font-size: 21px;
+  text-indent: 2em !important; /* 首行缩进2em，其他行不受影响 */
+}
+
+/* 块引用样式 - 确保首行缩进 */
+.article-body blockquote {
+  margin-bottom: 15px;
+  padding: 10px 20px;
+  background-color: #f9f9f9;
+  border-left: 4px solid #646cff;
+  font-style: italic;
+  text-indent: 2em !important; /* 首行缩进2em，其他行不受影响 */
+}
+
+/* 针对文章内容中的图片设置样式 - 增强版本 */
+.article-detail-page .article-body img {
+  display: block !important;
+  margin: 0 auto !important;
+  max-width: 100% !important;
+  height: auto !important;
+  border-radius: 8px;
+  text-align: center !important;
+  clear: both !important;
+  float: none !important;
+  padding: 10px 0;
+}
+
+/* 针对Markdown中的图片容器添加样式 */
+.article-detail-page .article-body p img {
+  text-align: center !important;
+  margin: 0 auto !important;
+}
+
+/* 确保内联HTML中的图片也居中 */
+.article-detail-page .article-body figure img {
+  display: block !important;
+  margin: 0 auto !important;
+}
+
+/* 确保markdown-it渲染的所有图片元素都居中 */
+:deep(img) {
+  display: block !important;
+  margin: 0 auto !important;
 }
 
 .article-body a {
@@ -539,6 +658,30 @@ route.params.id && watch(() => route.params.id, () => {
 
 .article-body a:hover {
   text-decoration: underline;
+}
+
+/* 针对Markdown粗体文本的样式 - 使用最高优先级确保生效 */
+:deep(.article-detail-page .article-body strong),
+:deep(.article-detail-page .article-body b),
+:deep(.article-body strong),
+:deep(.article-body b),
+.article-detail-page .article-body :deep(strong),
+.article-detail-page .article-body :deep(b),
+.article-body :deep(strong),
+.article-body :deep(b) {
+  font-weight: 350 !important;
+  font-family: 'Consola', 'Helvetica Neue', 'PingFang SC', 'Microsoft YaHei', 'SimHei', sans-serif !important;
+  color: #000 !important;
+}
+
+/* 加强标题的加粗效果 */
+.article-detail-page .article-body h1,
+.article-detail-page .article-body h2,
+.article-detail-page .article-body h3,
+.article-detail-page .article-body h4,
+.article-detail-page .article-body h5,
+.article-detail-page .article-body h6 {
+  font-weight: bold !important;
 }
 
 /* 行内代码样式 - 加强选择器优先级和使用!important确保生效 */

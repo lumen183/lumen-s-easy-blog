@@ -11,17 +11,9 @@
     <div class="recent-blogs">
       <h3 class="section-title"><i class="iconfont icon-zhiding"></i>置顶博客</h3>
       <div class="blog-item">
-        <p class="blog-title">全国第一个MCP服务器一体化开发测试软件</p>
-        <p class="blog-subtitle">OpenMCP发布！</p>
+        <p class="blog-title">等待更新</p>
+        <p class="blog-subtitle"></p>
         <p class="blog-date">Apr 13, 2025</p>
-      </div>
-      <div class="blog-item">
-        <p class="blog-title">闭环式问答机器人状态机设计</p>
-        <p class="blog-date">Jun 02, 2024</p>
-      </div>
-      <div class="blog-item">
-        <p class="blog-title">EDL (Evidential Deep Learning) 原理与代码实现</p>
-        <p class="blog-date">Apr 26, 2024</p>
       </div>
     </div>
 

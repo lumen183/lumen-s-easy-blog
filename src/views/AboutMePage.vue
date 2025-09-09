@@ -23,19 +23,18 @@
         
         <div class="info-section">
           <h3><i class="iconfont icon-guanyu"></i>个人简介</h3>
-          <p>你好，我是lumen，一名热爱技术的开发者。目前主要专注于前端开发、人工智能和游戏开发等领域。</p>
-          <p>这个博客是我分享知识、记录学习心得和展示作品的地方。</p>
+          <p> “觅渡，觅渡，渡在何处？” 读梁衡《觅渡，觅渡，渡何处》，为瞿秋白一生动容：他于白色恐怖中担起党之重任，舍文坛珠玉路赴革命，临刑前以《多余的话》剖白灵魂 ——“觅渡” 二字，恰是他上下求索的赤诚。</p>
+          <p> 我难有那般壮阔人生，却揣 “觅正道、渡己亦渡人” 之心：以文字记思考，与同路人探前路，故以 “觅渡” 名博客。
+梁衡言： “哲人者，宁肯舍其事而成其心”，我不敢妄称哲人，却愿循心而行，不负 “觅渡” 二字。</p>
+
         </div>
         
         <div class="info-section">
           <h3><i class="iconfont icon-gongzuo"></i>技术栈</h3>
           <div class="tech-stack">
-            <span class="tech-tag">Vue.js</span>
-            <span class="tech-tag">TypeScript</span>
-            <span class="tech-tag">JavaScript</span>
-            <span class="tech-tag">HTML/CSS</span>
+            <span class="tech-tag">Vue</span>
+            <span class="tech-tag">Go</span>
             <span class="tech-tag">Python</span>
-            <span class="tech-tag">AI</span>
           </div>
         </div>
         
@@ -131,7 +130,7 @@ import '../assets/icons/iconfont.css'
 }
 
 .info-item p {
-  font-size: 20px;
+  font-size: 16px;
   color: #666;
   margin: 0;
   font-style: italic;

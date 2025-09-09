@@ -1,125 +1,104 @@
-# 纯 Python 实现简易版本的前向计算图捕获工具
+# markdown编辑：从Marktext到vscode
 
-## 前言
+<style>
+  /* 仅对段落和块引用的第一行设置缩进 */
+  blockquote, p {
+    text-indent: 2em; /* 首行缩进2em，其他行不受影响 */
+  }
 
-最近知乎上有一位特殊的朋友发来求助，希望我帮助他实现`torch.fx.symbolic_trace`的简化版本。这让我想到，或许有很多开发者对计算图捕获的原理感兴趣，但又觉得官方实现过于复杂。因此，我决定写这篇文章，从零开始用纯Python实现一个简易的前向计算图捕获工具。
+  img {
+  display: block;
+  margin: 0 auto;
+  }
+</style>
 
-## 什么是计算图
+最近写笔记，写论文等等需求突然多了起来，不得不研究写markdown和typst的高级排版功能。大致整理如下：
 
-计算图是深度学习框架中用于表示计算过程的一种数据结构。它将复杂的计算分解为一系列简单的操作（如加法、乘法、卷积等），并以图的形式展示它们之间的依赖关系。
+## vscode中的markdown
 
-计算图的主要优点包括：
+笔者原来采用的是Marktext用来写markdown，不过最近发现vscode的markdown插件功能更强大，经过配置后，完全可以不输其他md编辑器。
 
-- **自动微分**：通过反向传播算法，可以自动计算梯度
-- **计算优化**：可以对计算过程进行各种优化
-- **硬件加速**：可以更有效地映射到GPU等硬件上执行
-- **序列化与部署**：便于模型的保存、加载和部署
+**好用的插件**
 
-## 简易计算图捕获工具的设计
+***M**arkdown **P**review **E**nhancer*（MPE）是首推的一款功能强大的markdown插件。集预览，导出各种文件为一体。通过打开侧边栏预览，在预览页右键，就可以很方便地执行各种功能
 
-我们的目标是创建一个工具，能够捕获Python函数中的计算过程，并生成对应的计算图表示。
+![排版示例](https://picx.zhimg.com/80/v2-6bc23cd7e968d4c8902c2343c9a42e00_1440w.webp?source=d16d100b){width=85%}
+不过PDF导出在wsl环境下可能有些问题，笔者试了一天还没试出来。
 
-### 核心思路
+**Paste Image Anywhere** &emsp; 该插件可以实现像Marktext那样，`Ctrl+V`粘贴图片的功能，并且还支持typst等其他编辑器。
 
-1. 使用Python的动态特性（如装饰器、反射）来跟踪函数调用
-2. 定义基本的计算节点类型
-3. 在函数执行过程中，自动构建计算图
-4. 提供可视化和序列化的功能
+**Markdown All in One** &emsp; 该插件主要实现了许多Marktext里的快捷键。如`Ctrl+B`可以加粗，`Ctrl+I`可以输出斜体文件。可以无缝衔接Marktext的快捷键。
 
-### 代码实现
+**markdownlint** &emsp; 这个插件可以规范markdown语法，提高写作质量。但是默认会给所有html弹警告。如果要取消，可以在设置中`settings.json`的`markdownlint`中添加配置：
 
-首先，我们定义一个基础的`Node`类，表示计算图中的一个节点：
-
-```python
-class Node:
-    def __init__(self, name, op_type, inputs=None):
-        self.name = name
-        self.op_type = op_type
-        self.inputs = inputs or []
-        self.output = None
-    
-    def forward(self):
-        # 根据不同的操作类型执行相应的计算
-        if self.op_type == 'add':
-            self.output = self.inputs[0].output + self.inputs[1].output
-        elif self.op_type == 'mul':
-            self.output = self.inputs[0].output * self.inputs[1].output
-        # 可以添加更多操作类型...
-        return self.output
+```json
+{
+  "markdownlint.config":{
+    "MD033": false
+  }
+}
 ```
 
-然后，我们创建一个`Graph`类，用于管理整个计算图：
+### 基础排版
 
-```python
-class Graph:
-    def __init__(self):
-        self.nodes = []
-        self.input_nodes = []
-        self.output_node = None
-        
-    def add_node(self, node):
-        self.nodes.append(node)
-        return node
-        
-    def visualize(self):
-        # 实现计算图的可视化
-        print("Computation Graph:")
-        for node in self.nodes:
-            inputs = [n.name for n in node.inputs]
-            print(f"{node.name} ({node.op_type}) -> Inputs: {inputs}")
+### 缩进的实现
+
+初步使用markdown时，最令我深恶痛绝的，就是每段不缩进，而且空格还会被视为压缩，导致每段都是顶格的。
+
+**解决方法：**
+
+1.使用`&nbsp;`或`&emsp;`这类空格符号，但这种方法用的不爽，不推荐
+
+2.使用html标签，在markdown顶部定义一个CSS样式，来实现全局的首行缩进。
+
+```html
+<style>
+  blockquote, p {
+    text-indent: 2em; /* 首行缩进2em，其他行不受影响 */
+  }
+</style>
 ```
 
-最后，我们创建一个装饰器`trace`，用于捕获函数中的计算过程：
+同样的，对于图片的排版也可以使用上述形式。
 
-```python
-def trace(func):
-    def wrapper(*args, **kwargs):
-        graph = Graph()
-        # 这里是简化版的实现逻辑
-        # 在实际实现中，需要更复杂的逻辑来跟踪变量和操作
-        print(f"Tracing function: {func.__name__}")
-        result = func(*args, **kwargs)
-        graph.visualize()
-        return result
-    return wrapper
+```html
+<style>
+    img  {
+        display:block,
+        margin: 0 auto;
+    }
+</style>
 ```
 
-## 使用示例
+给每章图片单独指定样式，还可以使用以下语法
 
-现在，让我们来看一个简单的使用示例：
-
-```python
-@trace
-def simple_model(x, y):
-    z = x + y
-    w = z * 2
-    return w
-
-# 使用我们的跟踪工具
-a = 10
-b = 20
-result = simple_model(a, b)
-print(f"Result: {result}")
+```markdown
+![文字](图片路径){样式，如 width=50%. }
 ```
 
-## 扩展与优化方向
+---
 
-这个简单的实现只是一个起点，还有很多可以改进的地方：
+## typst设置
 
-1. **支持更多操作类型**：目前只支持基本的加减乘除，需要扩展到支持更多的数学运算和深度学习操作
+对于typst来说，~~首先要找到一个好模板，然后就不用管了~~。typst用于排版要求更加多样的场景，基本上可以理解为轻量的一个LaTeX编辑器。
 
-2. **变量追踪**：改进变量追踪机制，能够更准确地捕获变量之间的依赖关系
+对于比较细节的排版文档，可以参考[官方文档](https://typst.com/docs/guide/typography-guide/)。
 
-3. **静态分析**：结合静态分析技术，在不执行代码的情况下构建计算图
+关于图片排版，这里介绍两个参数，用于缩放图片。
 
-4. **图优化**：添加图优化算法，如常量折叠、死代码消除等
+```typst
+#image("path", cover:"stretch", scaling:"smooth")
+```
 
-5. **自动微分**：实现反向传播算法，支持自动微分
+其中参数含义如下：
 
-## 总结
+**cover**：指定width,height比例不同时，要如何实现图片的缩放。接受参数有：
 
-通过本文的介绍，我们了解了计算图的基本概念，并实现了一个简易的前向计算图捕获工具。虽然这个实现相对简单，但它展示了计算图捕获的核心思想和技术。
+- `"contain"`：保持图片长宽比，缩放图片，使得图片完全覆盖容器。
+- `"stretch"`：拉伸图片，忽略长宽比，填满容器。
+- `"cover"`: 裁剪图片以适应容器。
 
-对于想要深入了解深度学习框架内部工作原理的读者，这个小项目是一个很好的起点。希望它能帮助你更好地理解PyTorch、TensorFlow等框架中的计算图机制。
+**scaling**：指定图片缩放的效果。接受参数有：
 
-如果你对这个项目感兴趣，可以在GitHub上找到完整的代码和更多的示例。也欢迎提出宝贵的建议和改进意见！
+- `"pixelated"`: 最近邻缩放。
+- `"smooth"`：平滑缩放图片。
