@@ -669,9 +669,10 @@ route.params.id && watch(() => route.params.id, () => {
 .article-detail-page .article-body :deep(b),
 .article-body :deep(strong),
 .article-body :deep(b) {
-  font-weight: 350 !important;
-  font-family: 'Consola', 'Helvetica Neue', 'PingFang SC', 'Microsoft YaHei', 'SimHei', sans-serif !important;
+  font-weight:350 !important;
+  font-family: 'Helvetica Neue', 'PingFang SC', 'Microsoft YaHei', 'SimHei', 'Consola', sans-serif !important;
   color: #000 !important;
+  font-size: 20px !important;
 }
 
 /* 加强标题的加粗效果 */
